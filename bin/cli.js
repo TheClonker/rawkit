@@ -7,6 +7,7 @@ const path = require('path')
 const http = require('http')
 const exec = require('child_process').exec
 const yargs = require('yargs')
+const isWsl = require('is-wsl');
 
 class CLI {
   constructor (args) {
@@ -17,7 +18,18 @@ class CLI {
     this.image = { path: '../extension/icon.png', type: 'image/png' }
     this.index = { path: '../extension/index.html', type: 'text/html' }
     this.caught = false
-    this.browser = `google chrome ${this.args.canary ? 'canary' : ''}`.trim()
+    
+    if (process.platform === 'darwin') {
+    	this.browser = `google chrome ${this.args.canary ? 'canary' : ''}`
+    } else if (process.platform === 'win32' || isWsl) {
+      //TODO Hardcoded is dirty af
+      this.browser = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+      //TODO Canary ?
+    } else if (process.platform === 'linux') {
+    	this.browser = `google-chrome${this.args.canary ? '-canary' : ''}`
+    }
+    
+    
   }
 
   get props () {
